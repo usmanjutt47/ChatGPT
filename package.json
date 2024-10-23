@@ -1,5 +1,5 @@
 {
-  "name": "chatgpt",
+  "name": "sticky-notes",
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
   "scripts": {
@@ -14,7 +14,10 @@
     "@react-navigation/native-stack": "^6.11.0",
     "axios": "^1.7.7",
     "expo": "~51.0.28",
+    "expo-app-loading": "^2.1.1",
+    "expo-font": "~12.0.10",
     "expo-image-picker": "~15.0.7",
+    "expo-splash-screen": "~0.27.6",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
     "react-native": "0.74.5",
