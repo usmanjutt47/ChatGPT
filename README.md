@@ -1,1 +1,1 @@
-# ChatGPT
+# sticky-notes
