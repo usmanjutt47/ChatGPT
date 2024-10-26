@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { TransitionPresets } from "@react-navigation/stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Home from "./screens/Home";
 import Details from "./screens/Details";
@@ -17,6 +17,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
 
   const loadFonts = async () => {
     await Font.loadAsync({
@@ -31,6 +32,9 @@ export default function App() {
     const loadResources = async () => {
       try {
         await loadFonts();
+
+        const userId = await AsyncStorage.getItem("userId");
+        setIsLoggedIn(userId !== null);
       } catch (e) {
         console.warn(e);
       } finally {
@@ -42,18 +46,15 @@ export default function App() {
     loadResources();
   }, []);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || isLoggedIn === null) {
     return null;
   }
 
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
-        screenOptions={{
-          headerShown: false,
-          // ...TransitionPresets.ModalSlideFromBottomIOS,
-        }}
+        initialRouteName={isLoggedIn ? "Home" : "Login"}
+        screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Details" component={Details} />
