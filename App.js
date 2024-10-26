@@ -3,10 +3,13 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { TransitionPresets } from "@react-navigation/stack";
 
 import Home from "./screens/Home";
 import Details from "./screens/Details";
 import CreateNotes from "./screens/CreateNotes";
+import Search from "./screens/Search";
+import Login from "./screens/Login";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +22,8 @@ export default function App() {
     await Font.loadAsync({
       PlusJakartaSansMedium: require("./assets/fonts/PlusJakartaSans-Medium.ttf"),
       PlusJakartaSansBold: require("./assets/fonts/PlusJakartaSans-Bold.ttf"),
+      PlusJakartaSansSemiBold: require("./assets/fonts/PlusJakartaSans-SemiBold.ttf"),
+      PlusJakartaSansRegular: require("./assets/fonts/PlusJakartaSans-Regular.ttf"),
     });
   };
 
@@ -45,11 +50,16 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Home"
-        screenOptions={{ headerShown: false }}
+        screenOptions={{
+          headerShown: false,
+          ...TransitionPresets.SlideFromRightIOS,
+        }}
       >
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Details" component={Details} />
         <Stack.Screen name="CreateNotes" component={CreateNotes} />
+        <Stack.Screen name="Search" component={Search} />
+        <Stack.Screen name="Login" component={Login} />
       </Stack.Navigator>
     </NavigationContainer>
   );
