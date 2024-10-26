@@ -10,6 +10,7 @@ import Details from "./screens/Details";
 import CreateNotes from "./screens/CreateNotes";
 import Search from "./screens/Search";
 import Login from "./screens/Login";
+import { NotesProvider } from "./context/NotesContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -51,17 +52,19 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={isLoggedIn ? "Home" : "Login"}
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Details" component={Details} />
-        <Stack.Screen name="CreateNotes" component={CreateNotes} />
-        <Stack.Screen name="Search" component={Search} />
-        <Stack.Screen name="Login" component={Login} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <NotesProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName={isLoggedIn ? "Home" : "Login"}
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Details" component={Details} />
+          <Stack.Screen name="CreateNotes" component={CreateNotes} />
+          <Stack.Screen name="Search" component={Search} />
+          <Stack.Screen name="Login" component={Login} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </NotesProvider>
   );
 }
