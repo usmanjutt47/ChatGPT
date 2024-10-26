@@ -5,18 +5,34 @@ import {
   TouchableHighlight,
   Image,
   Modal,
+  FlatList,
+  Pressable,
+  ScrollView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNotes } from "../context/NotesContext";
 
 export default function Home() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const { notes, fetchUserNotes, error } = useNotes();
+
+  useEffect(() => {
+    const fetchStoredUserId = async () => {
+      const storedUserId = await AsyncStorage.getItem("userId");
+      if (storedUserId) {
+        fetchUserNotes(storedUserId); // Pass userId to fetchUserNotes
+      }
+    };
+
+    fetchStoredUserId();
+  }, []);
 
   const handleCreate = () => {
     navigation.navigate("CreateNotes");
@@ -31,8 +47,12 @@ export default function Home() {
     navigation.navigate("Login");
   };
 
+  if (error) {
+    return <Text>Error loading notes...</Text>;
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: "#252525" }]}>
       <StatusBar style="light" />
       <View style={styles.innerContainer}>
         <View style={styles.header}>
@@ -54,13 +74,36 @@ export default function Home() {
             </View>
           </View>
         </View>
-        <View style={styles.noNotesContainer}>
-          <Image
-            source={require("../assets/images/no.png")}
-            style={styles.image}
+
+        {notes && notes.length === 0 ? (
+          <View style={styles.noNotesContainer}>
+            <Image
+              source={require("../assets/images/no.png")}
+              style={styles.image}
+            />
+            <Text style={styles.noNotesText}>Create your first note!</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={notes}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <ScrollView
+                contentContainerStyle={{ flex: 1 }}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+              >
+                <Pressable
+                  style={[styles.noteCard, { backgroundColor: item.color }]}
+                >
+                  <Text style={styles.noteTitle}>{item.title}</Text>
+                  <Text style={styles.noteContent}>{item.content}</Text>
+                </Pressable>
+              </ScrollView>
+            )}
           />
-          <Text style={styles.noNotesText}>Create your first note !</Text>
-        </View>
+        )}
+
         <TouchableHighlight style={styles.addContainer} onPress={handleCreate}>
           <AntDesign name="plus" size={28} color="#fff" />
         </TouchableHighlight>
@@ -113,7 +156,6 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#252525",
   },
   innerContainer: {
     height: "100%",
@@ -122,6 +164,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
+    marginBottom: "15%",
   },
   text: {
     fontSize: 43,
@@ -167,7 +210,7 @@ const styles = StyleSheet.create({
   addContainer: {
     height: 70,
     width: 70,
-    backgroundColor: "#252525",
+    backgroundColor: "#3B3B3B",
     position: "absolute",
     bottom: "5%",
     right: 5,
@@ -176,13 +219,7 @@ const styles = StyleSheet.create({
     borderRadius: 99,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
+    shadowColor: "rgba(0, 0, 0, 0.5)",
     elevation: 5,
   },
   modalOverlay: {
@@ -231,5 +268,23 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#FFFFFF",
     fontWeight: "bold",
+  },
+  notesContainer: {
+    marginTop: 20,
+  },
+  noteCard: {
+    borderRadius: 10,
+    marginBottom: 10,
+    padding: 30,
+    width: "100%",
+  },
+  noteTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  noteContent: {
+    fontSize: 16,
+    color: "#000",
   },
 });
