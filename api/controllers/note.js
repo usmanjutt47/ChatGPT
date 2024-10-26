@@ -3,12 +3,10 @@ const Note = require("../models/Note");
 const createNote = async (req, res) => {
   try {
     const { title, description } = req.body;
-    const image = req.file ? req.file.path : null;
 
     const newNote = new Note({
       title,
       description,
-      image,
     });
 
     await newNote.save();
