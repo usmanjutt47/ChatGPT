@@ -2,6 +2,7 @@ const User = require("../model/userModel");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+const Note = require("../model/noteModel");
 
 const generatePassword = () => {
   return crypto.randomBytes(4).toString("hex");
@@ -88,4 +89,50 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getAllUsers };
+const createNote = async (req, res) => {
+  const { title, content, userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  const color = Note.schema.paths.color.defaultValue();
+
+  try {
+    const newNote = new Note({
+      title,
+      content,
+      color,
+      userId,
+    });
+
+    await newNote.save();
+    res.status(201).json(newNote);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getUserNotes = async (req, res) => {
+  const userId = req.params.userId;
+
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+    const notes = await Note.find({ userId });
+
+    if (!notes || notes.length === 0) {
+      return res.status(404).json({ message: "No notes found for this user." });
+    }
+
+    res.status(200).json(notes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = { register, login, getAllUsers, createNote, getUserNotes };
