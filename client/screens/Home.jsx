@@ -4,21 +4,31 @@ import {
   StyleSheet,
   TouchableHighlight,
   Image,
+  Modal,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Home() {
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
+
   const handleCreate = () => {
     navigation.navigate("CreateNotes");
   };
+
   const handleSearch = () => {
     navigation.navigate("Search");
+  };
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("userId");
+    navigation.navigate("Login");
   };
 
   return (
@@ -35,7 +45,10 @@ export default function Home() {
               >
                 <AntDesign name="search1" size={24} color="#fff" />
               </TouchableHighlight>
-              <TouchableHighlight style={styles.searchContainer}>
+              <TouchableHighlight
+                style={styles.searchContainer}
+                onPress={() => setModalVisible(true)}
+              >
                 <MaterialIcons name="logout" size={24} color="#fff" />
               </TouchableHighlight>
             </View>
@@ -52,6 +65,47 @@ export default function Home() {
           <AntDesign name="plus" size={28} color="#fff" />
         </TouchableHighlight>
       </View>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View
+              style={{
+                height: "90%",
+                width: "90%",
+                alignSelf: "center",
+                justifyContent: "center",
+                alignContent: "center",
+              }}
+            >
+              <View style={{ alignSelf: "center" }}>
+                <MaterialIcons name="logout" size={24} color="#CFCFCF" />
+              </View>
+              <Text style={styles.modalMessage}>Logout from your account?</Text>
+              <View style={styles.modalButtons}>
+                <TouchableHighlight
+                  onPress={() => setModalVisible(false)}
+                  style={styles.button}
+                >
+                  <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                  onPress={handleLogout}
+                  style={styles.saveButton}
+                >
+                  <Text style={styles.buttonText}>Logout</Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -130,5 +184,52 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
     elevation: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    width: "85%",
+    height: "25%",
+    backgroundColor: "#252525",
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  modalMessage: {
+    fontSize: 16,
+    textAlign: "center",
+    marginVertical: 10,
+    color: "#CFCFCF",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "center",
+    gap: 10,
+  },
+  button: {
+    backgroundColor: "#ff0000",
+    borderRadius: 5,
+    height: 39,
+    width: 112,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  saveButton: {
+    backgroundColor: "#30BE71",
+    borderRadius: 5,
+    height: 39,
+    width: 112,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
   },
 });
