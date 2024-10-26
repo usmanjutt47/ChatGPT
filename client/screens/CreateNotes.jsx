@@ -7,38 +7,95 @@ import {
   Modal,
   Text,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import axios from "axios";
+import Toast from "react-native-toast-message";
 
 export default function CreateNotes() {
   const navigation = useNavigation();
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [content, setContent] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem("userId");
+        if (storedUserId) {
+          setUserId(storedUserId);
+        } else {
+          console.log("User ID not found in AsyncStorage");
+        }
+      } catch (error) {
+        console.error("Failed to fetch userId from AsyncStorage:", error);
+      }
+    };
+    fetchUserId();
+  }, []);
 
   const handleBack = () => {
     navigation.goBack();
   };
 
   const handleSave = () => {
+    if (!title || !content) {
+      Toast.show({
+        type: "error",
+        text1: "Missing Information",
+        text2: "Please fill in both title and content.",
+      });
+      return;
+    }
     setModalVisible(true);
   };
 
   const confirmSave = async () => {
     try {
-      const response = await axios.post("http://192.168.10.10:3000/api/notes", {
-        title,
-        description,
-      });
-      navigation.goBack();
+      if (!userId) {
+        Toast.show({
+          type: "error",
+          text1: "User ID Missing",
+          text2: "Unable to create note without User ID.",
+        });
+        return;
+      }
+
+      const response = await axios.post(
+        "http://192.168.10.2:5000/api/users/notes",
+        {
+          title,
+          content,
+          userId,
+        }
+      );
+
+      if (response.status === 201) {
+        Toast.show({
+          type: "success",
+          text1: "Note Saved",
+          text2: "Your note has been successfully created.",
+        });
+        navigation.navigate("Home", { newNote: true });
+      } else {
+        throw new Error("Failed to create note");
+      }
     } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error Saving Note",
+        text2: "Failed to create note. Please try again later.",
+      });
       console.error("Error creating note:", error);
     } finally {
       setModalVisible(false);
+      setTitle("");
+      setContent("");
     }
   };
 
@@ -81,8 +138,8 @@ export default function CreateNotes() {
             cursorColor={"#9A9A9A"}
             placeholderTextColor={"#9a9a9a"}
             multiline={true}
-            value={description}
-            onChangeText={setDescription}
+            value={content}
+            onChangeText={setContent}
           />
         </ScrollView>
       </View>
@@ -106,7 +163,7 @@ export default function CreateNotes() {
               <View style={{ alignSelf: "center" }}>
                 <MaterialIcons name="info" size={30} color="#606060" />
               </View>
-              <Text style={styles.modalMessage}>Save changes ?</Text>
+              <Text style={styles.modalMessage}>Save changes?</Text>
               <View style={styles.modalButtons}>
                 <TouchableHighlight
                   onPress={() => setModalVisible(false)}
@@ -163,7 +220,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(4000, 4000, 4000, 0.1)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
     width: "85%",
@@ -171,10 +228,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#252525",
     borderRadius: 20,
     alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
   },
   modalMessage: {
     fontSize: 16,
@@ -206,7 +259,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
-
   buttonText: {
     color: "#FFFFFF",
     fontWeight: "bold",
