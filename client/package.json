@@ -33,6 +33,7 @@
     "react-native-toast-message": "^2.2.1",
     "react-native-webview": "^11.23.0",
     "react-native-zss-rich-text-editor": "^1.1.0",
+    "swr": "^2.2.5",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
