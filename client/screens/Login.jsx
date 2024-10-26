@@ -4,6 +4,7 @@ import {
   TextInput,
   View,
   TouchableHighlight,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,6 +19,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Show password state
   const navigation = useNavigation();
 
   const handleSendCode = async () => {
@@ -78,7 +80,7 @@ export default function Login() {
       });
 
       // Store user ID (_id) in AsyncStorage
-      await AsyncStorage.setItem("userId", response.data.userId); // Store the user ID returned from backend
+      await AsyncStorage.setItem("userId", response.data.userId);
       console.log("User ID: " + response.data.userId);
 
       // Navigate to Home
@@ -136,10 +138,20 @@ export default function Login() {
                 placeholder="Enter your password"
                 style={styles.passwordInput}
                 placeholderTextColor={"#CCCCCC"}
-                secureTextEntry={true}
+                secureTextEntry={!showPassword}
                 value={password}
                 onChangeText={(text) => setPassword(text)}
               />
+              <Pressable
+                onPress={() => setShowPassword(!showPassword)}
+                style={{ padding: 10 }}
+              >
+                <MaterialIcons
+                  name={showPassword ? "visibility" : "visibility-off"}
+                  size={24}
+                  color="#CCCCCC"
+                />
+              </Pressable>
             </View>
             <TouchableHighlight
               style={styles.buttonContainer}
