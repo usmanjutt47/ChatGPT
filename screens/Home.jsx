@@ -8,20 +8,35 @@ import {
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useNavigation } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function Home() {
+  const navigation = useNavigation();
+  const handleCreate = () => {
+    navigation.navigate("CreateNotes");
+  };
+  const handleSearch = () => {
+    navigation.navigate("Search");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
       <View style={styles.innerContainer}>
         <View style={styles.header}>
           <View style={styles.headerInnerContainer}>
             <Text style={styles.text}>Notes</Text>
             <View style={{ flexDirection: "row", gap: 10 }}>
-              <TouchableHighlight style={styles.searchContainer}>
+              <TouchableHighlight
+                style={styles.searchContainer}
+                onPress={handleSearch}
+              >
                 <AntDesign name="search1" size={24} color="#fff" />
               </TouchableHighlight>
               <TouchableHighlight style={styles.searchContainer}>
-                <AntDesign name="infocirlceo" size={24} color="#fff" />
+                <MaterialIcons name="logout" size={24} color="#fff" />
               </TouchableHighlight>
             </View>
           </View>
@@ -33,8 +48,8 @@ export default function Home() {
           />
           <Text style={styles.noNotesText}>Create your first note !</Text>
         </View>
-        <TouchableHighlight style={styles.addContainer}>
-          <AntDesign name="plus" size={24} color="#fff" />
+        <TouchableHighlight style={styles.addContainer} onPress={handleCreate}>
+          <AntDesign name="plus" size={28} color="#fff" />
         </TouchableHighlight>
       </View>
     </SafeAreaView>
@@ -48,7 +63,7 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     height: "100%",
-    width: "90%",
+    width: "95%",
     alignSelf: "center",
   },
   header: {
