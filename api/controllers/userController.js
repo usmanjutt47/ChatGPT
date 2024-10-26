@@ -70,7 +70,7 @@ const login = async (req, res) => {
 
     res.status(200).json({
       message: "Login successful",
-      userId: user._id, // Return the user ID
+      userId: user._id,
     });
   } catch (error) {
     console.error(error);
