@@ -13,13 +13,14 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StatusBar } from "expo-status-bar";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // Show password state
+  const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
   const handleSendCode = async () => {
@@ -35,7 +36,7 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://192.168.10.2:5000/api/users/register",
+        "http://192.168.10.5:5000/api/users/register",
         { email }
       );
       Toast.show({
@@ -68,22 +69,19 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://192.168.10.2:5000/api/users/login",
+        "http://192.168.10.5:5000/api/users/login",
         { email, password }
       );
 
-      // Success toast
       Toast.show({
         type: "success",
         text1: "Success",
         text2: response.data.message,
       });
 
-      // Store user ID (_id) in AsyncStorage
       await AsyncStorage.setItem("userId", response.data.userId);
       console.log("User ID: " + response.data.userId);
 
-      // Navigate to Home
       navigation.navigate("Home");
     } catch (error) {
       Toast.show({
@@ -98,6 +96,7 @@ export default function Login() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
       <View style={{ height: "100%", width: "100%", justifyContent: "center" }}>
         <View style={styles.inputWrapper}>
           <MaterialIcons
@@ -165,7 +164,7 @@ export default function Login() {
           </View>
         )}
       </View>
-      <Toast />
+      <Toast position="bottom" />
     </SafeAreaView>
   );
 }
