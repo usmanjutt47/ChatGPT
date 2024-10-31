@@ -66,14 +66,11 @@ export default function CreateNotes() {
         return;
       }
 
-      const response = await axios.post(
-        "http://192.168.10.2:5000/api/users/notes",
-        {
-          title,
-          content,
-          userId,
-        }
-      );
+      const response = await axios.post("192.168.10.5:5000/api/users/notes", {
+        title,
+        content,
+        userId,
+      });
 
       if (response.status === 201) {
         Toast.show({
