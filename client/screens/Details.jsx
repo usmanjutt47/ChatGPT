@@ -19,8 +19,7 @@ const Detail = ({ route }) => {
   const navigation = useNavigation();
   const { title, description, image } = route.params;
   const [uploadImage, setUploadImage] = useState(null);
-  const [setTitle] = useState(""); // State for title
-  const [setDescription] = useState("");
+  const [setTitle] = useState("");
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -29,8 +28,6 @@ const Detail = ({ route }) => {
       aspect: [4, 3],
       quality: 1,
     });
-
-    // console.log(result);
 
     if (!result.canceled) {
       setUploadImage(result.assets[0].uri);
